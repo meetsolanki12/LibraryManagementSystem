@@ -1,0 +1,128 @@
+﻿@model IEnumerable<LibraryManagementSystem.Models.Borrowing>
+
+@{
+    ViewData["Title"] = "My Books";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">My Books</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Book</th>
+                    <th>Issue Date</th>
+                    <th>Return By</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        var isOverdue =
+                            item.Status == "Borrowed" &&
+                            item.DueDate < DateTime.Now;
+
+                        <tr>
+                            <td>@item.Book?.Title</td>
+
+                            <td>
+                                @if (item.Status == "Requested")
+                                {
+                                    <span>Waiting for issue</span>
+                                }
+                                else
+                                {
+                                    @item.IssueDate.ToString("dd MMM yyyy")
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Requested")
+                                {
+                                    <span>Not set yet</span>
+                                }
+                                else
+                                {
+                                    @item.DueDate.ToString("dd MMM yyyy")
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Requested")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Waiting for Admin
+                                    </span>
+                                }
+                                else if (item.Status == "Borrowed" && isOverdue)
+                                {
+                                    <span class="badge bg-danger">
+                                        Overdue
+                                    </span>
+                                }
+                                else if (item.Status == "Borrowed")
+                                {
+                                    <span class="badge bg-primary">
+                                        Issued
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        Returned
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Borrowed")
+                                {
+                                    <form asp-action="Return"
+                                          asp-route-id="@item.BorrowingId"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to return this book?');">
+                                            Return Book
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No action</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            You have no borrowing records yet.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

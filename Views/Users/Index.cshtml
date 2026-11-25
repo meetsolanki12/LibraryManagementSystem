@@ -1,0 +1,72 @@
+﻿
+@model IEnumerable<LibraryManagementSystem.Models.User>
+
+@{
+    ViewData["Title"] = "Total Users";
+}
+
+<style>
+    body {
+        background: #f4f7fb;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+    }
+
+    .users-card {
+        background: white;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.07);
+    }
+</style>
+
+<div class="page-header">
+    <h1>👥 Total Users</h1>
+    <p class="mb-0">Registered library users</p>
+</div>
+
+<div class="users-card">
+
+    <div class="mb-3">
+        <strong>Total registered users:</strong>
+        @Model.Count()
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>
+                            <span class="badge bg-primary">
+                                @user.Role
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

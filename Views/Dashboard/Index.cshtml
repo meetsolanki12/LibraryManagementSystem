@@ -1,0 +1,197 @@
+﻿@using LibraryManagementSystem.Models
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var role = Context.Session.GetString("Role");
+    var isAdmin = role == "Admin";
+
+    var overdueBorrowings =
+        ViewBag.OverdueBorrowings as List<Borrowing>
+        ?? new List<Borrowing>();
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Dashboard</h2>
+
+    @* ADMIN OVERDUE ALERT - shown first *@
+    @if (isAdmin)
+    {
+        if (overdueBorrowings.Any())
+        {
+            <div class="alert alert-danger shadow-sm mb-4">
+
+                <h4 class="alert-heading">
+                    <strong>Overdue Book Alert</strong>
+                </h4>
+
+                <p>
+                    There are
+                    <strong>@overdueBorrowings.Count</strong>
+                    overdue book(s). Please check the following records.
+                </p>
+
+                <hr />
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered bg-white mb-3">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Borrowed By</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in overdueBorrowings)
+                            {
+                                <tr>
+                                    <td>@item.Book?.Title</td>
+                                    <td>@item.User?.Name</td>
+                                    <td>
+                                        <strong>
+                                            @item.DueDate.ToString("dd MMM yyyy")
+                                        </strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <a asp-controller="Borrowings"
+                   asp-action="Index"
+                   class="btn btn-danger">
+                    View Borrowing Records
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success mb-4">
+                <strong>No overdue books.</strong>
+                All currently issued books are within their return dates.
+            </div>
+        }
+    }
+
+    @* DASHBOARD CARDS *@
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <a asp-controller="Books"
+               asp-action="Index"
+               class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Total Books</h5>
+                        <h2>@ViewBag.TotalBooks</h2>
+                        <span class="text-primary">View all books →</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Books"
+               asp-action="Index"
+               asp-route-availableOnly="true"
+               class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Available Books</h5>
+                        <h2>@ViewBag.AvailableBooks</h2>
+                        <span class="text-primary">View available books →</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Borrowings"
+               asp-action="@(isAdmin ? "Index" : "MyBooks")"
+               class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Issued Books</h5>
+                        <h2>@ViewBag.IssuedBooks</h2>
+                        <span class="text-primary">
+                            @(isAdmin ? "View borrowing records →" : "View my books →")
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Borrowings"
+               asp-action="@(isAdmin ? "Index" : "MyBooks")"
+               class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Overdue Books</h5>
+                        <h2 class="text-danger">@ViewBag.OverdueBooks</h2>
+                        <span class="text-primary">
+                            @(isAdmin ? "View overdue records →" : "View my books →")
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div class="col-md-4">
+                <a asp-controller="Users"
+                   asp-action="Index"
+                   class="text-decoration-none text-dark">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5>Total Users</h5>
+                            <h2>@ViewBag.TotalUsers</h2>
+                            <span class="text-primary">View all users →</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+
+    </div>
+
+    @* QUICK ACTIONS *@
+    <div class="mt-4">
+        <h4>Quick Actions</h4>
+
+        <a asp-controller="Books"
+           asp-action="Index"
+           class="btn btn-primary me-2 mb-2">
+            Manage Books
+        </a>
+
+        @if (isAdmin)
+        {
+            <a asp-controller="Borrowings"
+               asp-action="Index"
+               class="btn btn-secondary me-2 mb-2">
+                Borrowing Records
+            </a>
+
+            <a asp-controller="Users"
+               asp-action="Index"
+               class="btn btn-secondary mb-2">
+                Total Users
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Borrowings"
+               asp-action="MyBooks"
+               class="btn btn-secondary mb-2">
+                My Books
+            </a>
+        }
+    </div>
+
+</div>

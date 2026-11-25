@@ -1,0 +1,66 @@
+@model LibraryManagementSystem.Models.Book
+
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<style>
+    body {
+        background: #f4f7fb;
+    }
+
+    .delete-card {
+        background: white;
+        max-width: 650px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+    }
+
+    .delete-title {
+        color: #dc2626;
+        font-weight: 700;
+    }
+</style>
+
+<div class="delete-card">
+
+    <h2 class="delete-title">Delete Book</h2>
+
+    <p class="text-muted">
+        Are you sure you want to delete this book?
+    </p>
+
+    <hr />
+
+    <h4>@Model.Title</h4>
+
+    <p>
+        <strong>Author:</strong> @Model.Author
+    </p>
+
+    <p>
+        <strong>ISBN:</strong> @Model.ISBN
+    </p>
+
+    <p>
+        <strong>Category:</strong> @Model.Category?.CategoryName
+    </p>
+
+    <form asp-action="Delete">
+
+        <input type="hidden" asp-for="BookId" />
+
+        <button type="submit" class="btn btn-danger">
+            Delete Book
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>

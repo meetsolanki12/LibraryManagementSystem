@@ -1,0 +1,166 @@
+
+@model IEnumerable<LibraryManagementSystem.Models.Book>
+
+@{
+    ViewData["Title"] = "Books";
+    var role = Context.Session.GetString("Role");
+    var availableOnly = ViewBag.AvailableOnly == true;
+}
+
+<style>
+    body {
+        background: #f4f7fb;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+    }
+
+    .book-card {
+        background: white;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.07);
+    }
+
+    .create-btn {
+        background: #16a34a;
+        color: white;
+        padding: 9px 16px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .create-btn:hover {
+        background: #15803d;
+        color: white;
+    }
+</style>
+
+<div class="page-header">
+    @if (availableOnly)
+    {
+        <h1>📚 Available Books</h1>
+        <p class="mb-0">Books that currently have copies available</p>
+    }
+    else
+    {
+        <h1>📚 Books</h1>
+        <p class="mb-0">Browse and manage library books</p>
+    }
+</div>
+
+<div class="book-card">
+
+    @if (role == "Admin")
+    {
+        <div class="mb-4">
+            <a asp-action="Create" class="create-btn">
+                + Add New Book
+            </a>
+        </div>
+    }
+
+    @if (availableOnly)
+    {
+        <div class="mb-3">
+            <a asp-action="Index"
+               class="btn btn-outline-primary btn-sm">
+                View All Books
+            </a>
+        </div>
+    }
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Quantity</th>
+                    <th>Available</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@item.Title</td>
+                        <td>@item.Author</td>
+                        <td>@item.ISBN</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.AvailableQuantity</td>
+
+                        <td>
+                            <span class="badge bg-primary">
+                                @item.Category?.CategoryName
+                            </span>
+                        </td>
+
+                        <td>
+                            <a asp-action="Details"
+                               asp-route-bookid="@item.BookId"
+                               class="btn btn-sm btn-outline-secondary">
+                                Details
+                            </a>
+
+                            @if (role == "Admin")
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-bookid="@item.BookId"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-bookid="@item.BookId"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </a>
+                            }
+
+                            @if (role == "User")
+                            {
+                                if (item.AvailableQuantity > 0)
+                                {
+                                    <a asp-action="Borrow"
+                                       asp-route-bookid="@item.BookId"
+                                       class="btn btn-sm btn-success">
+                                        Borrow
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Not Available
+                                    </span>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                No books are currently available.
+            </div>
+        }
+
+    </div>
+</div>
